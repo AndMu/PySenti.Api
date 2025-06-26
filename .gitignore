@@ -1,0 +1,5 @@
+/CLAUDE.md
+/.claude/
+/tests/__pycache__/*.pyc
+/src/cryptosenti/__pycache__/*.pyc
+/.idea

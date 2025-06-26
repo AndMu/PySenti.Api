@@ -49,15 +49,6 @@ config = CryptoSentiConfig(
 client = SentimentClient(config)
 ```
 
-### Environment Variables
-
-Configuration can also be set via environment variables with the `CRYPTOSENTI_` prefix:
-
-```bash
-export CRYPTOSENTI_HUB_URL="https://crypto.pysenti.com/sentimentHub"
-export CRYPTOSENTI_LOG_LEVEL="DEBUG"
-```
-
 ## Usage
 
 ### Connecting and Subscribing

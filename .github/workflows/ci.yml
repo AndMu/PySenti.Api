@@ -51,6 +51,9 @@ jobs:
     runs-on: ubuntu-latest
     # Only build/publish on main branch
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      id-token: write  # Required for trusted publishing
+      contents: read   # Required to checkout code
 
     steps:
     - uses: actions/checkout@v4

@@ -11,9 +11,7 @@ from cryptosenti.models import NewsSummary, SentimentData, WorldNews
 def client():
     """Create a test client."""
     config = CryptoSentiConfig(
-        hub_url="https://test.example.com/hub",
-        auto_subscribe_summary=False,
-        auto_subscribe_sentiment=False
+        hub_url="https://test.example.com/hub"
     )
     return SentimentClient(config)
 
@@ -86,7 +84,7 @@ async def test_sentiment_handler_call():
     # Mock sentiment data
     sentiment_data = {
         "newsId": 123,
-        "sentiment": "positive",
+        "sentiment": "Bullish",
         "confidence": 85,
         "explanation": "Test explanation",
         "news": {
@@ -101,7 +99,6 @@ async def test_sentiment_handler_call():
     
     assert handler_called
     assert isinstance(received_sentiment, SentimentData)
-    assert received_sentiment.news_id == 123
 
 
 @pytest.mark.asyncio
@@ -121,10 +118,11 @@ async def test_connection_handlers():
     assert connection_states == [True, False]
 
 
-def test_client_not_connected_error():
+@pytest.mark.asyncio
+async def test_client_not_connected_error():
     """Test error when client is not connected."""
     client = SentimentClient()
     
     with pytest.raises(RuntimeError, match="Client not connected"):
         # This should be awaited in real usage, but we're testing the sync check
-        client.join_summary_group()
+        await client.join_summary_group()

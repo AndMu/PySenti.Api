@@ -91,8 +91,7 @@ def handle_summary(summary):
     print(f"Received summary with importance: {summary.importance}")
     print(f"Key themes: {', '.join(summary.key_themes_trends)}")
 
-def handle_sentiment(sentiment):
-    print(f"News ID: {sentiment.news_id}")
+def handle_sentiment(sentiment):    
     print(f"Sentiment: {sentiment.sentiment}")
     print(f"Confidence: {sentiment.confidence}")
 
@@ -119,7 +118,6 @@ The library provides strongly-typed data models that match the C# backend:
 - `timestamp`: When the summary was created
 
 #### SentimentData
-- `news_id`: ID of the news item
 - `sentiment`: Sentiment value (positive/negative/neutral)
 - `confidence`: Confidence score
 - `explanation`: Explanation of the sentiment
@@ -129,7 +127,6 @@ The library provides strongly-typed data models that match the C# backend:
 - `strength`: Sentiment strength
 
 #### WorldNews
-- `id`: News item ID
 - `headline`: News headline
 - `source`: News source
 - `urgency`: Urgency level

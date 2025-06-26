@@ -12,7 +12,7 @@ async def main():
     """Main example function."""
     # Create configuration
     config = CryptoSentiConfig(
-        hub_url="https://crypto.pysenti.com/sentimenthub",
+        hub_url="https://crypto.pysenti.com/sentimentHub",
         log_level="INFO"
     )
     
@@ -32,7 +32,6 @@ async def main():
     
     def on_sentiment_received(sentiment):
         print("\n=== SENTIMENT DATA ===")
-        print(f"News ID: {sentiment.news_id}")
         print(f"Headline: {sentiment.news.headline}")
         print(f"Source: {sentiment.news.source}")
         print(f"Sentiment: {sentiment.sentiment}")

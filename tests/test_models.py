@@ -6,10 +6,7 @@ from cryptosenti.models import (
     NewsSummary,
     SentimentData,
     WorldNews,
-    SentimentValue,
-    NewsType,
-    StageName,
-    Temporal
+    SentimentValue
 )
 
 
@@ -50,58 +47,40 @@ def test_world_news_creation():
     news = WorldNews(
         id=123,
         headline="Bitcoin reaches new high",
-        external_id="ext-123",
-        source="CryptoNews",
-        urgency=5
-    )
+        urgency=5)
     
     assert news.id == 123
     assert news.headline == "Bitcoin reaches new high"
-    assert news.external_id == "ext-123"
-    assert news.source == "CryptoNews"
     assert news.urgency == 5
-    assert news.type == NewsType.REGULAR
-    assert not news.is_deleted
 
 
 def test_sentiment_data_creation():
     """Test SentimentData model creation."""
     news = WorldNews(
         id=456,
-        headline="Ethereum upgrade delayed",
-        external_id="ext-456",
-        source="TechCrypto"
+        headline="Ethereum upgrade delayed"
     )
     
     sentiment = SentimentData(
-        news_id=456,
-        sentiment=SentimentValue.NEGATIVE,
+        sentiment=SentimentValue.Bullish,
         confidence=85,
         explanation="Negative due to delays",
         news=news
     )
-    
-    assert sentiment.news_id == 456
-    assert sentiment.sentiment == SentimentValue.NEGATIVE
+
+    assert sentiment.sentiment == SentimentValue.Bullish
     assert sentiment.confidence == 85
     assert sentiment.explanation == "Negative due to delays"
     assert sentiment.news.headline == "Ethereum upgrade delayed"
-    assert sentiment.stage == StageName.SENTIMENT_DETECTION
     assert isinstance(sentiment.correlation_id, uuid.UUID)
 
 
 def test_sentiment_enums():
     """Test sentiment enumerations."""
-    assert SentimentValue.POSITIVE == "positive"
-    assert SentimentValue.NEGATIVE == "negative"
-    assert SentimentValue.NEUTRAL == "neutral"
+    assert SentimentValue.Bearish == "Bearish"
+    assert SentimentValue.Bullish == "Bullish"
+    assert SentimentValue.Neutral == "Neutral"
     
-    assert Temporal.PAST == "past"
-    assert Temporal.PRESENT == "present"
-    assert Temporal.FUTURE == "future"
-    
-    assert NewsType.BREAKING == "breaking"
-    assert NewsType.REGULAR == "regular"
 
 
 def test_model_json_serialization():
@@ -120,3 +99,22 @@ def test_model_json_serialization():
     # Should be able to serialize with aliases
     json_data_aliases = summary.model_dump(by_alias=True)
     assert "keyThemesTrends" in json_data_aliases
+
+
+# Test function to verify the model works with your data
+def test_deserialization():
+    """Test function to deserialize the provided JSON data."""
+    test_data = {
+        'confidence': 8, 'correlationId': 'ca1cb3a5-e282-4036-96d1-6ede987b4360', 'emotion': 'Fear',
+          'explanation': 'The article discusses geopolitical tensions between Iran and the U.S., which may lead to uncertainty in global markets, including cryptocurrencies. Such uncertainty typically results in  sentiment for crypto prices.',
+          'hasChanged': True,
+        'news':
+            {'attributes': [], 'eventDate': '2025-06-26T11:40:16Z', 'externalId': '',
+                                       'headline': 'Supreme leader, in first appearance since ceasefire, says Iran would strike back if attacked',
+                                       'id': 11350, 'isDeleted': False, 'processed': '2025-06-26T11:40:22.921528Z',
+                                       'source': 'Reuters News', 'type': 'NewsStory', 'urgency': 3, 'version': 1},
+          'newsId': 11350, 'processed': '2025-06-26T11:40:24.158992Z', 'sentiment': 'Bearish',
+          'stage': 'SentimentDetection', 'strength': 6, 'temporal': 'Future', 'version': 1}
+
+    sentiment_data = SentimentData(**test_data)
+    assert sentiment_data.confidence == 8

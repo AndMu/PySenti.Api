@@ -14,10 +14,6 @@ class CryptoSentiConfig(BaseModel):
     
     # No authentication required for public API
     
-    # Subscription settings
-    auto_subscribe_summary: bool = Field(default=True, description="Auto-subscribe to summary signals")
-    auto_subscribe_sentiment: bool = Field(default=True, description="Auto-subscribe to sentiment signals")
-    
     # Logging settings
     log_level: str = Field(default="INFO", description="Logging level")
     log_format: str = Field(

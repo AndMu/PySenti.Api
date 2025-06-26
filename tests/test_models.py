@@ -2,12 +2,8 @@
 
 import uuid
 from datetime import datetime
-from cryptosenti.models import (
-    NewsSummary,
-    SentimentData,
-    WorldNews,
-    SentimentValue
-)
+
+from cryptosenti.models import NewsSummary, SentimentData, SentimentValue, WorldNews
 
 
 def test_news_summary_creation():
@@ -17,7 +13,7 @@ def test_news_summary_creation():
         sentiment_summary="Mixed sentiment",
         importance=7
     )
-    
+
     assert summary.key_themes_trends == ["Bitcoin", "Regulation"]
     assert summary.sentiment_summary == "Mixed sentiment"
     assert summary.importance == 7
@@ -33,7 +29,7 @@ def test_news_summary_with_aliases():
         "actionableInsights": ["Hold positions"],
         "importance": 8
     }
-    
+
     summary = NewsSummary.model_validate(data)
     assert summary.key_themes_trends == ["DeFi", "NFT"]
     assert summary.impactful_events_and_implications == ["Market crash"]
@@ -48,7 +44,7 @@ def test_world_news_creation():
         id=123,
         headline="Bitcoin reaches new high",
         urgency=5)
-    
+
     assert news.id == 123
     assert news.headline == "Bitcoin reaches new high"
     assert news.urgency == 5
@@ -60,7 +56,7 @@ def test_sentiment_data_creation():
         id=456,
         headline="Ethereum upgrade delayed"
     )
-    
+
     sentiment = SentimentData(
         sentiment=SentimentValue.Bullish,
         confidence=85,
@@ -80,7 +76,7 @@ def test_sentiment_enums():
     assert SentimentValue.Bearish == "Bearish"
     assert SentimentValue.Bullish == "Bullish"
     assert SentimentValue.Neutral == "Neutral"
-    
+
 
 
 def test_model_json_serialization():
@@ -90,12 +86,12 @@ def test_model_json_serialization():
         sentiment_summary="Test summary",
         importance=5
     )
-    
+
     # Should be able to serialize to JSON
     json_data = summary.model_dump()
     assert "key_themes_trends" in json_data
     assert "importance" in json_data
-    
+
     # Should be able to serialize with aliases
     json_data_aliases = summary.model_dump(by_alias=True)
     assert "keyThemesTrends" in json_data_aliases

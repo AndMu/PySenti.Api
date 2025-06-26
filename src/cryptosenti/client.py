@@ -2,32 +2,32 @@
 
 import asyncio
 import logging
-from typing import Callable, Optional, Any, Dict, List
+from collections.abc import Callable
+from typing import Any
 
 from pysignalr.client import SignalRClient
 
 from .config import CryptoSentiConfig
 from .models import NewsSummary, SentimentData
 
-
 logger = logging.getLogger(__name__)
 
 
 class SentimentClient:
     """SignalR client for PySenti sentiment analysis."""
-    
-    def __init__(self, config: Optional[CryptoSentiConfig] = None):
+
+    def __init__(self, config: CryptoSentiConfig | None = None):
         """Initialize the sentiment client.
-        
+
         Args:
             config: Configuration for the client. If None, uses default config.
         """
         self.config = config or CryptoSentiConfig()
-        self._client: Optional[SignalRClient] = None
+        self._client: SignalRClient | None = None
         self._connection_lock = asyncio.Lock()
         self._is_connected = False
         self._connected_ev = asyncio.Event()
-        self._client_task: Optional[asyncio.Task] = None
+        self._client_task: asyncio.Task | None = None
 
         # Event handlers
         self._summary_handlers: list[Callable[[NewsSummary], None]] = []
@@ -71,12 +71,12 @@ class SentimentClient:
                 try:
                     await asyncio.wait_for(self._connected_ev.wait(), timeout=self.config.connection_timeout)
                     logger.info("Successfully connected to SignalR hub")
-                except asyncio.TimeoutError:
+                except asyncio.TimeoutError as e:
                     await self._cleanup()
-                    raise ConnectionError("Failed to connect to SignalR hub within timeout")
+                    raise ConnectionError("Failed to connect to SignalR hub within timeout") from e
 
-            except:
-                logger.exception(f"Failed to connect to SignalR hub")
+            except Exception:
+                logger.exception("Failed to connect to SignalR hub")
                 await self._cleanup()
                 raise
 
@@ -95,8 +95,8 @@ class SentimentClient:
                     except asyncio.CancelledError:
                         pass
 
-            except:
-                logger.exception(f"Error during disconnect")
+            except Exception:
+                logger.exception("Error during disconnect")
             finally:
                 await self._cleanup()
 
@@ -116,7 +116,7 @@ class SentimentClient:
             await self._client.send("JoinSummaryGroup", [])
             logger.info("Joined summary group")
         except:
-            logger.exception(f"Failed to join summary group")
+            logger.exception("Failed to join summary group")
             raise
 
     async def join_sentiment_group(self) -> None:
@@ -128,7 +128,7 @@ class SentimentClient:
             await self._client.send("JoinSentimentGroup", [])
             logger.info("Joined sentiment group")
         except:
-            logger.exception(f"Failed to join sentiment group")
+            logger.exception("Failed to join sentiment group")
             raise
 
     def on_summary_received(self, handler: Callable[[NewsSummary], None]) -> None:
@@ -156,7 +156,7 @@ class SentimentClient:
         """
         self._connection_handlers.append(handler)
 
-    async def _process_message_data(self, data: Any, model_class: type, handlers: List, message_type: str) -> None:
+    async def _process_message_data(self, data: Any, model_class: type, handlers: list, message_type: str) -> None:
         """Generic method to process incoming message data."""
         try:
             # Handle both list and dict data formats
@@ -185,7 +185,7 @@ class SentimentClient:
         except Exception as e:
             logger.exception(f"Failed to parse {message_type} data: {e}")
 
-    async def _on_summary_received(self, data: List[Dict[str, Any]]) -> None:
+    async def _on_summary_received(self, data: list[dict[str, Any]]) -> None:
         """Handle summary received from SignalR."""
         await self._process_message_data(
             data=data,
@@ -194,7 +194,7 @@ class SentimentClient:
             message_type="summary"
         )
 
-    async def _on_sentiment_received(self, data: Dict[str, Any]) -> None:
+    async def _on_sentiment_received(self, data: dict[str, Any]) -> None:
         """Handle sentiment data received from SignalR."""
         await self._process_message_data(
             data=data,
@@ -216,8 +216,8 @@ class SentimentClient:
                     await handler(True)
                 else:
                     handler(True)
-            except:
-                logger.exception(f"Error in connection handler")
+            except Exception:
+                logger.exception("Error in connection handler")
 
     async def _on_disconnected(self) -> None:
         """Handle SignalR connection lost."""
@@ -232,24 +232,24 @@ class SentimentClient:
                     await handler(False)
                 else:
                     handler(False)
-            except:
-                logger.exception(f"Error in connection handler")
+            except Exception:
+                logger.exception("Error in connection handler")
 
     async def _on_error(self, message) -> None:
         """Handle SignalR errors."""
         error_text = getattr(message, 'error', str(message))
         logger.error(f"SignalR error: {error_text}")
-    
+
     @property
     def is_connected(self) -> bool:
         """Check if the client is connected."""
         return self._is_connected
-    
+
     async def __aenter__(self):
         """Async context manager entry."""
         await self.connect()
         return self
-    
+
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         """Async context manager exit."""
         await self.disconnect()

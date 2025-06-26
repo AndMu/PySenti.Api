@@ -1,10 +1,12 @@
 """Tests for SignalR client."""
 
+from unittest.mock import MagicMock
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+
 from cryptosenti.client import SentimentClient
 from cryptosenti.config import CryptoSentiConfig
-from cryptosenti.models import NewsSummary, SentimentData, WorldNews
+from cryptosenti.models import NewsSummary, SentimentData
 
 
 @pytest.fixture
@@ -29,11 +31,11 @@ def test_event_handler_registration(client):
     summary_handler = MagicMock()
     sentiment_handler = MagicMock()
     connection_handler = MagicMock()
-    
+
     client.on_summary_received(summary_handler)
     client.on_sentiment_received(sentiment_handler)
     client.on_connection_changed(connection_handler)
-    
+
     assert len(client._summary_handlers) == 1
     assert len(client._sentiment_handlers) == 1
     assert len(client._connection_handlers) == 1
@@ -45,23 +47,23 @@ async def test_summary_handler_call():
     client = SentimentClient()
     handler_called = False
     received_summary = None
-    
+
     def summary_handler(summary):
         nonlocal handler_called, received_summary
         handler_called = True
         received_summary = summary
-    
+
     client.on_summary_received(summary_handler)
-    
+
     # Mock summary data
     summary_data = {
         "keyThemesTrends": ["Bitcoin", "Test"],
         "sentimentSummary": "Test summary",
         "importance": 5
     }
-    
+
     await client._on_summary_received(summary_data)
-    
+
     assert handler_called
     assert isinstance(received_summary, NewsSummary)
     assert received_summary.key_themes_trends == ["Bitcoin", "Test"]
@@ -73,14 +75,14 @@ async def test_sentiment_handler_call():
     client = SentimentClient()
     handler_called = False
     received_sentiment = None
-    
+
     def sentiment_handler(sentiment):
         nonlocal handler_called, received_sentiment
         handler_called = True
         received_sentiment = sentiment
-    
+
     client.on_sentiment_received(sentiment_handler)
-    
+
     # Mock sentiment data
     sentiment_data = {
         "newsId": 123,
@@ -94,9 +96,9 @@ async def test_sentiment_handler_call():
             "source": "TestSource"
         }
     }
-    
+
     await client._on_sentiment_received(sentiment_data)
-    
+
     assert handler_called
     assert isinstance(received_sentiment, SentimentData)
 
@@ -106,15 +108,15 @@ async def test_connection_handlers():
     """Test connection state change handlers."""
     client = SentimentClient()
     connection_states = []
-    
+
     def connection_handler(connected):
         connection_states.append(connected)
-    
+
     client.on_connection_changed(connection_handler)
-    
+
     await client._on_connected()
     await client._on_disconnected()
-    
+
     assert connection_states == [True, False]
 
 
@@ -122,7 +124,7 @@ async def test_connection_handlers():
 async def test_client_not_connected_error():
     """Test error when client is not connected."""
     client = SentimentClient()
-    
+
     with pytest.raises(RuntimeError, match="Client not connected"):
         # This should be awaited in real usage, but we're testing the sync check
         await client.join_summary_group()

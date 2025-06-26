@@ -5,9 +5,8 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 from enum import Enum
-from typing import Optional, Union
 
-from pydantic import BaseModel, Field, field_validator, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class SentimentValue(str, Enum):
@@ -59,12 +58,12 @@ class WorldNews(BaseModel):
     attributes: list[str] = Field(default_factory=list)
     version: int = 1
     urgency: int = 0
-    processed: Union[datetime, str] = Field(default_factory=lambda: datetime.utcnow())
-    event_date: Union[datetime, str] = Field(default_factory=lambda: datetime.utcnow(), alias="eventDate")
-    type: Optional[str] = None
+    processed: datetime | str = Field(default_factory=lambda: datetime.utcnow())
+    event_date: datetime | str = Field(default_factory=lambda: datetime.utcnow(), alias="eventDate")
+    type: str | None = None
 
     @classmethod
-    def parse_datetime(cls, v: Union[str, datetime]) -> datetime:
+    def parse_datetime(cls, v: str | datetime) -> datetime:
         if isinstance(v, str):
             try:
                 return datetime.fromisoformat(v.replace('Z', '+00:00'))
@@ -78,9 +77,9 @@ class SentimentTopic(BaseModel):
 
     model_config = ConfigDict(populate_by_name=True)
 
-    id: Optional[Union[str, int]] = None  # Made optional and allow int
-    name: Optional[str] = None            # Made optional
-    description: Optional[str] = None
+    id: str | int | None = None  # Made optional and allow int
+    name: str | None = None            # Made optional
+    description: str | None = None
 
 
 class SentimentData(BaseModel):
@@ -94,17 +93,17 @@ class SentimentData(BaseModel):
         }
     )
 
-    processed: Union[datetime, str] = Field(default_factory=lambda: datetime.utcnow())
-    sentiment: Optional[SentimentValue] = None
-    stage: Optional[str] = None
-    temporal: Optional[Temporal] = None
-    emotion: Optional[str] = None
-    strength: Optional[int] = None
+    processed: datetime | str = Field(default_factory=lambda: datetime.utcnow())
+    sentiment: SentimentValue | None = None
+    stage: str | None = None
+    temporal: Temporal | None = None
+    emotion: str | None = None
+    strength: int | None = None
     explanation: str
     news: WorldNews
-    topic: Optional[SentimentTopic] = None
-    topic_id: Optional[Union[str, int]] = Field(None, alias="topicId")  # Added missing field
-    correlation_id: Union[uuid.UUID, str] = Field(default_factory=uuid.uuid4, alias="correlationId")
-    confidence: Optional[int] = None
+    topic: SentimentTopic | None = None
+    topic_id: str | int | None = Field(None, alias="topicId")  # Added missing field
+    correlation_id: uuid.UUID | str = Field(default_factory=uuid.uuid4, alias="correlationId")
+    confidence: int | None = None
     version: int = 1
     has_changed: bool = Field(default=True, alias="hasChanged")

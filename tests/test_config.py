@@ -1,13 +1,12 @@
 """Tests for configuration."""
 
-import os
 from cryptosenti.config import CryptoSentiConfig
 
 
 def test_default_config():
     """Test default configuration values."""
     config = CryptoSentiConfig()
-    
+
     assert config.hub_url == "https://crypto.pysenti.com/sentimenthub"
     assert config.connection_timeout == 30
     assert config.reconnect_attempts == 5
@@ -23,7 +22,7 @@ def test_custom_config():
         reconnect_attempts=3,
         log_level="DEBUG"
     )
-    
+
     assert config.hub_url == "https://custom.example.com/hub"
     assert config.connection_timeout == 60
     assert config.reconnect_attempts == 3

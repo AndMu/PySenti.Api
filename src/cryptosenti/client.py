@@ -2,7 +2,7 @@
 
 import asyncio
 import logging
-from typing import Callable, Optional, Any, Dict
+from typing import Callable, Optional, Any, Dict, List
 
 from pysignalr.client import SignalRClient
 
@@ -156,43 +156,52 @@ class SentimentClient:
         """
         self._connection_handlers.append(handler)
 
-    async def _on_summary_received(self, data: Dict[str, Any]) -> None:
-        """Handle summary received from SignalR."""
+    async def _process_message_data(self, data: Any, model_class: type, handlers: List, message_type: str) -> None:
+        """Generic method to process incoming message data."""
         try:
-            summary = NewsSummary.model_validate(data)
-            logger.debug(f"Received summary: {summary.importance}")
+            # Handle both list and dict data formats
+            items = data if isinstance(data, list) else [data]
 
-            # Call all registered handlers
-            for handler in self._summary_handlers:
-                try:
-                    if asyncio.iscoroutinefunction(handler):
-                        await handler(summary)
-                    else:
-                        handler(summary)
-                except:
-                    logger.exception(f"Error in summary handler")
+            for item in items:
+                # Validate and parse the message
+                message_obj = model_class.model_validate(item)
 
-        except:
-            logger.exception(f"Failed to parse summary data")
+                # Log based on message type
+                if message_type == "summary":
+                    logger.debug(f"Received summary: {message_obj.importance}")
+                elif message_type == "sentiment":
+                    logger.debug(f"Received sentiment for news {message_obj.correlation_id}")
+
+                # Call all registered handlers
+                for handler in handlers:
+                    try:
+                        if asyncio.iscoroutinefunction(handler):
+                            await handler(message_obj)
+                        else:
+                            handler(message_obj)
+                    except Exception:
+                        logger.exception(f"Error in {message_type} handler")
+
+        except Exception as e:
+            logger.exception(f"Failed to parse {message_type} data: {e}")
+
+    async def _on_summary_received(self, data: List[Dict[str, Any]]) -> None:
+        """Handle summary received from SignalR."""
+        await self._process_message_data(
+            data=data,
+            model_class=NewsSummary,
+            handlers=self._summary_handlers,
+            message_type="summary"
+        )
 
     async def _on_sentiment_received(self, data: Dict[str, Any]) -> None:
         """Handle sentiment data received from SignalR."""
-        try:
-            sentiment = SentimentData.model_validate(data)
-            logger.debug(f"Received sentiment for news {sentiment.correlation_id}")
-
-            # Call all registered handlers
-            for handler in self._sentiment_handlers:
-                try:
-                    if asyncio.iscoroutinefunction(handler):
-                        await handler(sentiment)
-                    else:
-                        handler(sentiment)
-                except:
-                    logger.exception(f"Error in sentiment handler")
-
-        except Exception as e:
-            logger.exception(f"Failed to parse sentiment data: {e}")
+        await self._process_message_data(
+            data=data,
+            model_class=SentimentData,
+            handlers=self._sentiment_handlers,
+            message_type="sentiment"
+        )
 
     async def _on_connected(self) -> None:
         """Handle SignalR connection established."""

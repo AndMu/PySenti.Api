@@ -20,7 +20,7 @@ def test_custom_config():
         hub_url="https://custom.example.com/hub",
         connection_timeout=60,
         reconnect_attempts=3,
-        log_level="DEBUG"
+        log_level="DEBUG",
     )
 
     assert config.hub_url == "https://custom.example.com/hub"

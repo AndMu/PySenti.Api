@@ -12,9 +12,7 @@ from cryptosenti.models import NewsSummary, SentimentData
 @pytest.fixture
 def client():
     """Create a test client."""
-    config = CryptoSentiConfig(
-        hub_url="https://test.example.com/hub"
-    )
+    config = CryptoSentiConfig(hub_url="https://test.example.com/hub")
     return SentimentClient(config)
 
 
@@ -59,7 +57,7 @@ async def test_summary_handler_call():
     summary_data = {
         "keyThemesTrends": ["Bitcoin", "Test"],
         "sentimentSummary": "Test summary",
-        "importance": 5
+        "importance": 5,
     }
 
     await client._on_summary_received(summary_data)
@@ -93,8 +91,8 @@ async def test_sentiment_handler_call():
             "id": 123,
             "headline": "Test headline",
             "externalId": "ext-123",
-            "source": "TestSource"
-        }
+            "source": "TestSource",
+        },
     }
 
     await client._on_sentiment_received(sentiment_data)

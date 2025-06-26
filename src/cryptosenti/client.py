@@ -41,7 +41,7 @@ class SentimentClient:
         """Setup logging configuration."""
         logging.basicConfig(
             level=getattr(logging, self.config.log_level.upper()),
-            format=self.config.log_format
+            format=self.config.log_format,
         )
 
     async def connect(self) -> None:
@@ -53,9 +53,7 @@ class SentimentClient:
 
             try:
                 # Setup SignalR client
-                self._client = SignalRClient(
-                    url=self.config.hub_url
-                )
+                self._client = SignalRClient(url=self.config.hub_url)
 
                 # Register event handlers using the correct pysignalr API
                 self._client.on_open(self._on_connected)
@@ -69,11 +67,16 @@ class SentimentClient:
 
                 # Wait for connection with timeout
                 try:
-                    await asyncio.wait_for(self._connected_ev.wait(), timeout=self.config.connection_timeout)
+                    await asyncio.wait_for(
+                        self._connected_ev.wait(),
+                        timeout=self.config.connection_timeout,
+                    )
                     logger.info("Successfully connected to SignalR hub")
                 except asyncio.TimeoutError as e:
                     await self._cleanup()
-                    raise ConnectionError("Failed to connect to SignalR hub within timeout") from e
+                    raise ConnectionError(
+                        "Failed to connect to SignalR hub within timeout"
+                    ) from e
 
             except Exception:
                 logger.exception("Failed to connect to SignalR hub")
@@ -156,7 +159,9 @@ class SentimentClient:
         """
         self._connection_handlers.append(handler)
 
-    async def _process_message_data(self, data: Any, model_class: type, handlers: list, message_type: str) -> None:
+    async def _process_message_data(
+        self, data: Any, model_class: type, handlers: list, message_type: str
+    ) -> None:
         """Generic method to process incoming message data."""
         try:
             # Handle both list and dict data formats
@@ -170,7 +175,9 @@ class SentimentClient:
                 if message_type == "summary":
                     logger.debug(f"Received summary: {message_obj.importance}")
                 elif message_type == "sentiment":
-                    logger.debug(f"Received sentiment for news {message_obj.correlation_id}")
+                    logger.debug(
+                        f"Received sentiment for news {message_obj.correlation_id}"
+                    )
 
                 # Call all registered handlers
                 for handler in handlers:
@@ -191,7 +198,7 @@ class SentimentClient:
             data=data,
             model_class=NewsSummary,
             handlers=self._summary_handlers,
-            message_type="summary"
+            message_type="summary",
         )
 
     async def _on_sentiment_received(self, data: dict[str, Any]) -> None:
@@ -200,7 +207,7 @@ class SentimentClient:
             data=data,
             model_class=SentimentData,
             handlers=self._sentiment_handlers,
-            message_type="sentiment"
+            message_type="sentiment",
         )
 
     async def _on_connected(self) -> None:
@@ -237,7 +244,7 @@ class SentimentClient:
 
     async def _on_error(self, message) -> None:
         """Handle SignalR errors."""
-        error_text = getattr(message, 'error', str(message))
+        error_text = getattr(message, "error", str(message))
         logger.error(f"SignalR error: {error_text}")
 
     @property

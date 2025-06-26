@@ -18,7 +18,9 @@ async def main():
         print(f"   Sentiment: {summary.sentiment_summary}")
 
     async def handle_sentiment(sentiment):
-        print(f"💭 Sentiment: {sentiment.sentiment} for '{sentiment.news.headline[:50]}...'")
+        print(
+            f"💭 Sentiment: {sentiment.sentiment} for '{sentiment.news.headline[:50]}...'"
+        )
 
     # Use client as context manager for automatic cleanup
     try:

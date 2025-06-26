@@ -13,8 +13,7 @@ async def main():
     """Main example function."""
     # Create configuration
     config = CryptoSentiConfig(
-        hub_url="https://crypto.pysenti.com/sentimentHub",
-        log_level="INFO"
+        hub_url="https://crypto.pysenti.com/sentimentHub", log_level="INFO"
     )
 
     # Create client
@@ -27,7 +26,9 @@ async def main():
         print(f"Timestamp: {summary.timestamp}")
         print(f"Key Themes: {', '.join(summary.key_themes_trends)}")
         print(f"Sentiment Summary: {summary.sentiment_summary}")
-        print(f"Impactful Events: {', '.join(summary.impactful_events_and_implications)}")
+        print(
+            f"Impactful Events: {', '.join(summary.impactful_events_and_implications)}"
+        )
         print(f"Actionable Insights: {', '.join(summary.actionable_insights)}")
         print("==================\n")
 

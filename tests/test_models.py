@@ -11,7 +11,7 @@ def test_news_summary_creation():
     summary = NewsSummary(
         key_themes_trends=["Bitcoin", "Regulation"],
         sentiment_summary="Mixed sentiment",
-        importance=7
+        importance=7,
     )
 
     assert summary.key_themes_trends == ["Bitcoin", "Regulation"]
@@ -27,7 +27,7 @@ def test_news_summary_with_aliases():
         "impactfulEventsAndImplications": ["Market crash"],
         "sentimentSummary": "Negative outlook",
         "actionableInsights": ["Hold positions"],
-        "importance": 8
+        "importance": 8,
     }
 
     summary = NewsSummary.model_validate(data)
@@ -40,10 +40,7 @@ def test_news_summary_with_aliases():
 
 def test_world_news_creation():
     """Test WorldNews model creation."""
-    news = WorldNews(
-        id=123,
-        headline="Bitcoin reaches new high",
-        urgency=5)
+    news = WorldNews(id=123, headline="Bitcoin reaches new high", urgency=5)
 
     assert news.id == 123
     assert news.headline == "Bitcoin reaches new high"
@@ -52,16 +49,13 @@ def test_world_news_creation():
 
 def test_sentiment_data_creation():
     """Test SentimentData model creation."""
-    news = WorldNews(
-        id=456,
-        headline="Ethereum upgrade delayed"
-    )
+    news = WorldNews(id=456, headline="Ethereum upgrade delayed")
 
     sentiment = SentimentData(
         sentiment=SentimentValue.Bullish,
         confidence=85,
         explanation="Negative due to delays",
-        news=news
+        news=news,
     )
 
     assert sentiment.sentiment == SentimentValue.Bullish
@@ -78,13 +72,10 @@ def test_sentiment_enums():
     assert SentimentValue.Neutral == "Neutral"
 
 
-
 def test_model_json_serialization():
     """Test JSON serialization of models."""
     summary = NewsSummary(
-        key_themes_trends=["Test"],
-        sentiment_summary="Test summary",
-        importance=5
+        key_themes_trends=["Test"], sentiment_summary="Test summary", importance=5
     )
 
     # Should be able to serialize to JSON
@@ -101,16 +92,32 @@ def test_model_json_serialization():
 def test_deserialization():
     """Test function to deserialize the provided JSON data."""
     test_data = {
-        'confidence': 8, 'correlationId': 'ca1cb3a5-e282-4036-96d1-6ede987b4360', 'emotion': 'Fear',
-          'explanation': 'The article discusses geopolitical tensions between Iran and the U.S., which may lead to uncertainty in global markets, including cryptocurrencies. Such uncertainty typically results in  sentiment for crypto prices.',
-          'hasChanged': True,
-        'news':
-            {'attributes': [], 'eventDate': '2025-06-26T11:40:16Z', 'externalId': '',
-                                       'headline': 'Supreme leader, in first appearance since ceasefire, says Iran would strike back if attacked',
-                                       'id': 11350, 'isDeleted': False, 'processed': '2025-06-26T11:40:22.921528Z',
-                                       'source': 'Reuters News', 'type': 'NewsStory', 'urgency': 3, 'version': 1},
-          'newsId': 11350, 'processed': '2025-06-26T11:40:24.158992Z', 'sentiment': 'Bearish',
-          'stage': 'SentimentDetection', 'strength': 6, 'temporal': 'Future', 'version': 1}
+        "confidence": 8,
+        "correlationId": "ca1cb3a5-e282-4036-96d1-6ede987b4360",
+        "emotion": "Fear",
+        "explanation": "The article discusses geopolitical tensions between Iran and the U.S., which may lead to uncertainty in global markets, including cryptocurrencies. Such uncertainty typically results in  sentiment for crypto prices.",
+        "hasChanged": True,
+        "news": {
+            "attributes": [],
+            "eventDate": "2025-06-26T11:40:16Z",
+            "externalId": "",
+            "headline": "Supreme leader, in first appearance since ceasefire, says Iran would strike back if attacked",
+            "id": 11350,
+            "isDeleted": False,
+            "processed": "2025-06-26T11:40:22.921528Z",
+            "source": "Reuters News",
+            "type": "NewsStory",
+            "urgency": 3,
+            "version": 1,
+        },
+        "newsId": 11350,
+        "processed": "2025-06-26T11:40:24.158992Z",
+        "sentiment": "Bearish",
+        "stage": "SentimentDetection",
+        "strength": 6,
+        "temporal": "Future",
+        "version": 1,
+    }
 
     sentiment_data = SentimentData(**test_data)
     assert sentiment_data.confidence == 8

@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 class CryptoSentiConfig(BaseModel):
     """Configuration for CryptoSenti SignalR client."""
 
-    hub_url: str = Field(default="https://crypto.pysenti.com/sentimenthub")
+    hub_url: str = Field(default="https://crypto.pysenti.com/sentimentHub")
     connection_timeout: int = Field(
         default=30, description="Connection timeout in seconds"
     )

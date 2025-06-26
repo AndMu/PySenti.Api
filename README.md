@@ -40,7 +40,7 @@ You can customize the client behavior using `CryptoSentiConfig`:
 from cryptosenti import SentimentClient, CryptoSentiConfig
 
 config = CryptoSentiConfig(
-    hub_url="https://crypto.pysenti.com/sentimenthub",
+    hub_url="https://crypto.pysenti.com/sentimentHub",
     connection_timeout=30,
     reconnect_attempts=5,
     log_level="DEBUG"
@@ -54,7 +54,7 @@ client = SentimentClient(config)
 Configuration can also be set via environment variables with the `CRYPTOSENTI_` prefix:
 
 ```bash
-export CRYPTOSENTI_HUB_URL="https://crypto.pysenti.com/sentimenthub"
+export CRYPTOSENTI_HUB_URL="https://crypto.pysenti.com/sentimentHub"
 export CRYPTOSENTI_LOG_LEVEL="DEBUG"
 ```
 

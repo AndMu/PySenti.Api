@@ -160,7 +160,11 @@ class SentimentClient:
         self._connection_handlers.append(handler)
 
     async def _process_message_data(
-        self, data: Any, model_class: type[Any], handlers: list[Callable[..., Any]], message_type: str
+        self,
+        data: Any,
+        model_class: type[Any],
+        handlers: list[Callable[..., Any]],
+        message_type: str,
     ) -> None:
         """Generic method to process incoming message data."""
         try:

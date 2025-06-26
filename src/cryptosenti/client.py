@@ -27,7 +27,7 @@ class SentimentClient:
         self._connection_lock = asyncio.Lock()
         self._is_connected = False
         self._connected_ev = asyncio.Event()
-        self._client_task: asyncio.Task | None = None
+        self._client_task: asyncio.Task[Any] | None = None
 
         # Event handlers
         self._summary_handlers: list[Callable[[NewsSummary], None]] = []
@@ -160,7 +160,7 @@ class SentimentClient:
         self._connection_handlers.append(handler)
 
     async def _process_message_data(
-        self, data: Any, model_class: type, handlers: list, message_type: str
+        self, data: Any, model_class: type[Any], handlers: list[Callable[..., Any]], message_type: str
     ) -> None:
         """Generic method to process incoming message data."""
         try:
@@ -242,7 +242,7 @@ class SentimentClient:
             except Exception:
                 logger.exception("Error in connection handler")
 
-    async def _on_error(self, message) -> None:
+    async def _on_error(self, message: Any) -> None:
         """Handle SignalR errors."""
         error_text = getattr(message, "error", str(message))
         logger.error(f"SignalR error: {error_text}")
@@ -252,11 +252,11 @@ class SentimentClient:
         """Check if the client is connected."""
         return self._is_connected
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> "SentimentClient":
         """Async context manager entry."""
         await self.connect()
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         """Async context manager exit."""
         await self.disconnect()
